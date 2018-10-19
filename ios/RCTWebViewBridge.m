@@ -77,6 +77,7 @@ NSString *const RCTWebViewBridgeSchema = @"wvb";
 @property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
 @property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
 @property (nonatomic, copy) RCTDirectEventBlock onBridgeMessage;
+@property (nonatomic, copy) RCTDirectEventBlock onPasteboardChanged;
 
 @end
 
@@ -95,8 +96,31 @@ NSString *const RCTWebViewBridgeSchema = @"wvb";
     _webView = [[UIWebView alloc] initWithFrame:self.bounds];
     _webView.delegate = self;
     [self addSubview:_webView];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(interceptPasteboard) name:UIPasteboardChangedNotification object:nil];
   }
   return self;
+}
+
+-(IBAction)interceptPasteboard
+{
+  if (_disablePasteboard) {
+    NSString *copyClip = [UIPasteboard generalPasteboard].string;
+    NSString *defaultString = @"Please subscribe to essayBot";
+    if (![copyClip isEqualToString:defaultString]) {
+
+      //set content to default string
+      UIPasteboard *pb = [UIPasteboard generalPasteboard];
+      [pb setString:defaultString];
+
+      //send content to React Native
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary:@{
+        @"content": copyClip,
+      }];
+      _onPasteboardChanged(event);
+    }
+  }
 }
 
 RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)

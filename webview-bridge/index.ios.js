@@ -106,6 +106,10 @@ var WebViewBridge = createReactClass({
      */
     onBridgeMessage: PropTypes.func,
 
+    onPasteboardChanged: PropTypes.func,
+
+    disablePasteboard: PropTypes.bool,
+
     hideKeyboardAccessoryView: PropTypes.bool,
 
     keyboardDisplayRequiresUserAction: PropTypes.bool,
@@ -180,9 +184,19 @@ var WebViewBridge = createReactClass({
       }
     };
 
+    var onPasteboardChanged = (event: Event) => {
+      console.log("onPasteboardChanged1", event)
+      const onPasteboardChangedCallback = this.props.onPasteboardChanged;
+      if (onPasteboardChangedCallback) {
+        console.log("onPasteboardChanged2", event)
+        onPasteboardChangedCallback(event.nativeEvent);
+      }
+    }
+
     let {source, ...props} = {...this.props};
     delete props.onBridgeMessage;
     delete props.onShouldStartLoadWithRequest;
+    delete props.onPasteboardChanged
 
     var webView =
       <RCTWebViewBridge
@@ -196,6 +210,7 @@ var WebViewBridge = createReactClass({
         onLoadingError={this.onLoadingError}
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
         onBridgeMessage={onBridgeMessage}
+        onPasteboardChanged={this.onPasteboardChanged}
       />;
 
     return (
@@ -249,6 +264,7 @@ var WebViewBridge = createReactClass({
   },
 
   onLoadingStart: function(event: Event) {
+    console.log("onLoadStart has been triggered")
     var onLoadStart = this.props.onLoadStart;
     onLoadStart && onLoadStart(event);
     this.updateNavigationState(event);
@@ -267,7 +283,12 @@ var WebViewBridge = createReactClass({
     });
   },
 
+  onPasteboardChanged: function(event: Event) {
+    this.props.onPasteboardChanged(event.nativeEvent)
+  },
+
   onLoadingFinish: function(event: Event) {
+    console.log("onLoadingFinish has been triggered")
     var {onLoad, onLoadEnd} = this.props;
     onLoad && onLoad(event);
     onLoadEnd && onLoadEnd(event);
@@ -283,6 +304,7 @@ var RCTWebViewBridge = requireNativeComponent('RCTWebViewBridge', WebViewBridge,
     onLoadingStart: true,
     onLoadingError: true,
     onLoadingFinish: true,
+    onPasteboardChanged: true,
   },
 });
 

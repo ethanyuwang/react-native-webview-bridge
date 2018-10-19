@@ -65,6 +65,9 @@ RCT_EXPORT_VIEW_PROPERTY(onShouldStartLoadWithRequest, RCTDirectEventBlock)
 RCT_REMAP_VIEW_PROPERTY(allowsInlineMediaPlayback, _webView.allowsInlineMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(onBridgeMessage, RCTDirectEventBlock)
 RCT_REMAP_VIEW_PROPERTY(keyboardDisplayRequiresUserAction, _webView.keyboardDisplayRequiresUserAction, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(disablePasteboard, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(onPasteboardChanged, RCTDirectEventBlock)
+
 
 - (NSDictionary<NSString *, id> *)constantsToExport
 {
