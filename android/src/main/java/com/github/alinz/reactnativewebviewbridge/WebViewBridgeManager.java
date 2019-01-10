@@ -1,6 +1,10 @@
 package com.github.alinz.reactnativewebviewbridge;
 
+import android.content.Context;
 import android.webkit.WebView;
+import android.content.ClipboardManager;
+import android.content.ClipboardManager.OnPrimaryClipChangedListener;
+import android.content.ClipData;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -16,6 +20,8 @@ public class WebViewBridgeManager extends ReactWebViewManager {
     private static final String REACT_CLASS = "RCTWebViewBridge";
 
     public static final int COMMAND_SEND_TO_BRIDGE = 101;
+
+    private boolean disableCopy = true;
 
     @Override
     public String getName() {
@@ -35,6 +41,17 @@ public class WebViewBridgeManager extends ReactWebViewManager {
 
     @Override
     protected WebView createViewInstance(ThemedReactContext reactContext) {
+        //add listener for clipboard
+        final ClipboardManager clipboard = (ClipboardManager) reactContext.getSystemService(Context.CLIPBOARD_SERVICE);
+        clipboard.addPrimaryClipChangedListener( new ClipboardManager.OnPrimaryClipChangedListener() {
+            public void onPrimaryClipChanged() {
+                if (disableCopy) {
+                    clipboard.setPrimaryClip(ClipData.newPlainText(null, "Please subscribe to essayBot"));
+                }
+            }
+        });
+
+        //initialize WebView
         WebView root = super.createViewInstance(reactContext);
         root.addJavascriptInterface(new JavascriptBridge(root), "WebViewBridge");
         return root;
@@ -74,5 +91,10 @@ public class WebViewBridgeManager extends ReactWebViewManager {
     @ReactProp(name = "allowUniversalAccessFromFileURLs")
     public void setAllowUniversalAccessFromFileURLs(WebView root, boolean allows) {
         root.getSettings().setAllowUniversalAccessFromFileURLs(allows);
+    }
+
+    @ReactProp(name = "disablePasteboard")
+    public void disablePasteboard(WebView root, boolean disable) {
+        disableCopy = disable;
     }
 }
