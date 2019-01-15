@@ -13,7 +13,12 @@ import java.util.List;
 public class WebViewBridgePackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactApplicationContext) {
-        return new ArrayList<>();
+        //return new ArrayList<>();
+        List<NativeModule> modules = new ArrayList<>();
+
+        modules.add(new ClipBoardIntercepter(reactApplicationContext));
+
+        return modules;
     }
 
     @Override

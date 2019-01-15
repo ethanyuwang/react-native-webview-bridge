@@ -31,10 +31,15 @@ var {
   WebView,
   requireNativeComponent,
   DeviceEventEmitter,
+  NativeEventEmitter,
   NativeModules: {
-    WebViewBridgeManager
+    WebViewBridgeManager,
+    ClipBoardIntercepter
   }
 } = ReactNative;
+
+//init ClipBoardIntercepter
+const clipBoardIntercepterEmitter = new NativeEventEmitter(ClipBoardIntercepter)
 
 var RCT_WEBVIEWBRIDGE_REF = 'webviewbridge';
 
@@ -58,6 +63,7 @@ var WebViewBridge = createReactClass({
      * Will be called once the message is being sent from webview
      */
     onBridgeMessage: PropTypes.func,
+    onPasteboardChanged: PropTypes.func,
   },
 
   getInitialState: function() {
@@ -81,6 +87,21 @@ var WebViewBridge = createReactClass({
     if (this.props.startInLoadingState) {
       this.setState({viewState: WebViewBridgeState.LOADING});
     }
+
+    this.clipBoardIntercepterEmitterSubscription = clipBoardIntercepterEmitter.addListener('onPasteboardChanged', this.props.onPasteboardChanged)
+    //console.log("this.props.disablePasteboard is initialized with : [", this.props.disablePasteboard, "]");
+    ClipBoardIntercepter.setDisableCopy(this.props.disablePasteboard);
+  },
+
+  componentDidUpdate: function(prevProps) {
+    if (this.props.disablePasteboard !== prevProps.disablePasteboard) {
+      //console.log("this.props.disablePasteboard has changed to: [", this.props.disablePasteboard, "]");
+      ClipBoardIntercepter.setDisableCopy(this.props.disablePasteboard);
+    }
+  },
+
+  componentWillUnmount: function() {
+    this.clipBoardIntercepterEmitterSubscription.remove()
   },
 
   render: function() {
