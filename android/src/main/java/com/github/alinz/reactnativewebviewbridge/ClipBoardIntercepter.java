@@ -3,21 +3,17 @@ package com.github.alinz.reactnativewebviewbridge;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebView;
+import android.os.Looper;
 
-import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.react.uimanager.ThemedReactContext;
-import com.facebook.react.uimanager.annotations.ReactProp;
-import com.facebook.react.uimanager.events.RCTEventEmitter;
+
+import android.os.Handler;
 
 import javax.annotation.Nullable;
 
@@ -44,6 +40,14 @@ public class ClipBoardIntercepter extends ReactContextBaseJavaModule implements 
         reactContext.addLifecycleEventListener(this);
 
         //get ClipboardManager
+        /*Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                //this.mClipboard = (ClipboardManager) reactContext.getSystemService(Context.CLIPBOARD_SERVICE);
+            }
+        });*/
+
         this.mClipboard = (ClipboardManager) reactContext.getSystemService(Context.CLIPBOARD_SERVICE);
 
         //subscribe to clipboard manager
@@ -53,20 +57,20 @@ public class ClipBoardIntercepter extends ReactContextBaseJavaModule implements 
 
     @Override
     public void onHostResume() {
-        subscribeClipboardManager();
+        //subscribeClipboardManager();
         this.disableCopy = this.disableCopyBackup;
     }
 
     @Override
     public void onHostPause() {
-        unsubscribeClipboardManager();
+        //unsubscribeClipboardManager();
         //TODO: fix unsubscribeClipboardManager not working properly
         this.disableCopy = false;
     }
 
     @Override
     public void onHostDestroy() {
-        unsubscribeClipboardManager();
+        //unsubscribeClipboardManager();
         this.disableCopy = false;
     }
 

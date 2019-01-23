@@ -83,6 +83,13 @@ public class WebViewBridgeManager extends ReactWebViewManager {
         );
     }
 
+    @ReactProp(name = "requestFocus")
+    public void requestFocus(WebView root, boolean isRequestFocus) {
+        if(isRequestFocus) {
+            root.requestFocus();
+        }
+    }
+
     @ReactProp(name = "allowFileAccessFromFileURLs")
     public void setAllowFileAccessFromFileURLs(WebView root, boolean allows) {
         root.getSettings().setAllowFileAccessFromFileURLs(allows);
