@@ -30,6 +30,22 @@ public class ClipBoardIntercepter extends ReactContextBaseJavaModule implements 
     private boolean disableCopy = true;
     private boolean disableCopyBackup = true;
 
+    //customized handler that passes ReactApplicationContext and does the initialization
+    public class MyRunnable implements Runnable {
+        private ReactApplicationContext reactContext;
+        public MyRunnable(ReactApplicationContext reactContext) {
+            this.reactContext = reactContext;
+        }
+
+        @Override
+        public void run() {
+            mClipboard = (ClipboardManager) reactContext.getSystemService(Context.CLIPBOARD_SERVICE);
+            initializeClipboardListener();
+            subscribeClipboardManager();
+        }
+    }
+
+
     @Override
     public String getName() {
         return "ClipBoardIntercepter";
@@ -39,20 +55,10 @@ public class ClipBoardIntercepter extends ReactContextBaseJavaModule implements 
         super(reactContext);
         reactContext.addLifecycleEventListener(this);
 
-        //get ClipboardManager
-        /*Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                //this.mClipboard = (ClipboardManager) reactContext.getSystemService(Context.CLIPBOARD_SERVICE);
-            }
-        });*/
-
-        this.mClipboard = (ClipboardManager) reactContext.getSystemService(Context.CLIPBOARD_SERVICE);
-
-        //subscribe to clipboard manager
-        initializeClipboardListener();
-        subscribeClipboardManager();
+        //run the initialization in a handler to avoid `Can't create handler inside thread that has not called Looper.prepare()`
+        Handler handler = new Handler(Looper.getMainLooper());
+        MyRunnable obj = new MyRunnable(reactContext);
+        handler.post(obj);
     }
 
     @Override
