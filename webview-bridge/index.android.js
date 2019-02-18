@@ -34,7 +34,8 @@ var {
   NativeEventEmitter,
   NativeModules: {
     WebViewBridgeManager,
-    ClipBoardIntercepter
+    ClipBoardIntercepter,
+    RNKeyboard
   }
 } = ReactNative;
 
@@ -164,6 +165,10 @@ var WebViewBridge = createReactClass({
     if (this.props.onBridgeMessage != null && event.nativeEvent != null) {
       this.props.onBridgeMessage(event.nativeEvent.message)
     }
+  },
+
+  showAndroidKeyboard: function() {
+    RNKeyboard.showKeyboard();
   },
 
   goForward: function() {

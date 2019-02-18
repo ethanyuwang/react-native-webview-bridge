@@ -17,7 +17,7 @@ public class WebViewBridgePackage implements ReactPackage {
         List<NativeModule> modules = new ArrayList<>();
 
         modules.add(new ClipBoardIntercepter(reactApplicationContext));
-        //modules.add(new RNKeyboard(reactApplicationContext));
+        modules.add(new RNKeyboard(reactApplicationContext));
 
         return modules;
     }
